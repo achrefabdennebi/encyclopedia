@@ -1,8 +1,15 @@
+from django import forms
 from django.shortcuts import render
 
 from . import util
 
 from re import search as searchSubstr
+
+class NewPageForm(forms.Form): 
+    title = forms.CharField(label="New entry")
+    content = forms.CharField(widget=forms.Textarea(
+        attrs={"cols":5, "rows":5, "placeholder": "Content of entry"}))
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -41,4 +48,18 @@ def search(request):
     return render(request, "encyclopedia/searchResults.html", {
     "title": "Search Results: {}".format(keyword),
     "entries": search_results
+    })
+
+def add(request):
+    if request.method == "POST":
+        form = NewPageForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            print(title)
+            print(content)
+
+    return render(request, "encyclopedia/add.html", {
+        "title": "Add entry",
+        "form": NewPageForm()
     })
