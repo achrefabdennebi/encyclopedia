@@ -1,12 +1,13 @@
 from django import forms
 from django.shortcuts import render, HttpResponseRedirect, reverse
-
 from . import util
 
 from re import search as searchSubstr
 
 class NewPageForm(forms.Form): 
     title = forms.CharField(label="New entry")
+    type_view = forms.CharField(widget=forms.HiddenInput(), 
+    required = False, initial="add")
     content = forms.CharField(widget=forms.Textarea(
         attrs={"cols":5, "rows":5, "placeholder": "Content of entry"}))
 
@@ -56,8 +57,9 @@ def add(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
-            isExistedTitle = util.get_entry(title)
-            if isExistedTitle != None:
+            type_view = form.cleaned_data["type_view"]
+            is_existed_title = util.get_entry(title)
+            if is_existed_title != None and type_view == "add":
                 msg = "Existed page name, please try again."
                 return  render(request, "encyclopedia/add.html", {
                             "title": "Add entry",
@@ -72,4 +74,12 @@ def add(request):
     return render(request, "encyclopedia/add.html", {
         "title": "Add entry",
         "form": NewPageForm()
+    })
+
+def edit(request, title):
+    entry = util.get_entry(title)
+    form = NewPageForm({'title': title, 'content': entry, 'type_view': 'edit'})
+    return render(request, "encyclopedia/add.html",{
+        "title": "Edit entry",
+        "form": form
     })
