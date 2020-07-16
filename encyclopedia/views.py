@@ -1,5 +1,5 @@
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponseRedirect, reverse
 
 from . import util
 
@@ -56,8 +56,18 @@ def add(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
-            print(title)
-            print(content)
+            isExistedTitle = util.get_entry(title)
+            if isExistedTitle != None:
+                msg = "Existed page name, please try again."
+                return  render(request, "encyclopedia/add.html", {
+                            "title": "Add entry",
+                            "form": NewPageForm(),
+                            "Error": msg
+                        })
+            else: 
+                util.save_entry(title, content)
+                return HttpResponseRedirect(reverse("entryPage", args=[title]))
+
 
     return render(request, "encyclopedia/add.html", {
         "title": "Add entry",
