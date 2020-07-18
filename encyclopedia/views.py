@@ -1,7 +1,7 @@
+import random
 from django import forms
 from django.shortcuts import render, HttpResponseRedirect, reverse
 from . import util
-
 from re import search as searchSubstr
 
 class NewPageForm(forms.Form): 
@@ -83,3 +83,7 @@ def edit(request, title):
         "title": "Edit entry",
         "form": form
     })
+
+def random_link(request): 
+    random_title  = random.choice(util.list_entries())
+    return HttpResponseRedirect(reverse("entryPage", args=[random_title]))
