@@ -1,4 +1,6 @@
 import random
+from markdown2 import Markdown
+
 from django import forms
 from django.shortcuts import render, HttpResponseRedirect, reverse
 from . import util
@@ -25,9 +27,10 @@ def entryPage(request, title):
             "error" : "Oops ! entry not exited, please enter an existing entry."
         })
 
+    converted_markdown = Markdown().convert(entry)
     return render(request, "encyclopedia/entrypage.html", {
         "title" : title.capitalize(),
-        "entry": entry
+        "entry": converted_markdown
     })
 
 def search(request):
